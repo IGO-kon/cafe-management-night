@@ -24,22 +24,26 @@ def add_product():
         category = request.form['category']
         price = float(request.form['price'])
 
-        # データベースに接続
         conn = sqlite3.connect('cafe_management.db')
         cursor = conn.cursor()
-
-        # データベースにデータを挿入
         cursor.execute("INSERT INTO Products (name, category, price) VALUES (?, ?, ?)", (name, category, price))
         conn.commit()
-
-        # データベース接続を閉じる
         conn.close()
 
         print("データベースに商品情報を追加しました。")
-
         return redirect(url_for('add_product'))
 
     return render_template('add_product.html')
+
+@app.route('/products')
+def list_products():
+    conn = sqlite3.connect('cafe_management.db')
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Products")
+    products = cursor.fetchall()
+    conn.close()
+
+    return render_template('list_products.html', products=products)
 
 if __name__ == '__main__':
     init_db()
