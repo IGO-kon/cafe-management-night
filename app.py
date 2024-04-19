@@ -67,6 +67,44 @@ def list_products():
 
     return render_template('list_products.html', products=products)
 
+@app.route('/product/edit/<int:product_id>', methods=['GET', 'POST'])
+def edit_product(product_id):
+    conn = sqlite3.connect('cafe_management.db')
+    cursor = conn.cursor()
+
+    if request.method == 'POST':
+        name = request.form['name']
+        category = request.form['category']
+        price = float(request.form['price'])
+
+        cursor.execute("UPDATE Products SET name=?, category=?, price=? WHERE id=?", (name, category, price, product_id))
+        conn.commit()
+        conn.close()
+
+        print(f"ID {product_id} の商品情報を更新しました。")
+        return redirect(url_for('list_products'))
+
+    cursor.execute("SELECT * FROM Products WHERE id=?", (product_id,))
+    product = cursor.fetchone()
+    conn.close()
+
+    if product:
+        return render_template('edit_product.html', product=product)
+    else:
+        return "商品が見つかりませんでした。", 404
+
+@app.route('/product/delete/<int:product_id>', methods=['POST'])
+def delete_product(product_id):
+    conn = sqlite3.connect('cafe_management.db')
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM Products WHERE id=?", (product_id,))
+    conn.commit()
+    conn.close()
+
+    print(f"ID {product_id} の商品を削除しました。")
+    return redirect(url_for('list_products'))
+
 @app.route('/stock/add', methods=['GET', 'POST'])
 def add_stock():
     if request.method == 'POST':
