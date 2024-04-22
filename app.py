@@ -58,88 +58,14 @@ def add_product():
     return render_template('add_product.html')
 
 @app.route('/products')
-def list_products():
+def show_products():
     conn = sqlite3.connect('cafe_management.db')
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Products")
+    cursor.execute("SELECT id, name, category, price FROM Products")
     products = cursor.fetchall()
     conn.close()
 
-    return render_template('list_products.html', products=products)
-
-@app.route('/product/edit/<int:product_id>', methods=['GET', 'POST'])
-def edit_product(product_id):
-    conn = sqlite3.connect('cafe_management.db')
-    cursor = conn.cursor()
-
-    if request.method == 'POST':
-        name = request.form['name']
-        category = request.form['category']
-        price = float(request.form['price'])
-
-        cursor.execute("UPDATE Products SET name=?, category=?, price=? WHERE id=?", (name, category, price, product_id))
-        conn.commit()
-        conn.close()
-
-        print(f"ID {product_id} の商品情報を更新しました。")
-        return redirect(url_for('list_products'))
-
-    cursor.execute("SELECT * FROM Products WHERE id=?", (product_id,))
-    product = cursor.fetchone()
-    conn.close()
-
-    if product:
-        return render_template('edit_product.html', product=product)
-    else:
-        return "商品が見つかりませんでした。", 404
-
-@app.route('/product/delete/<int:product_id>', methods=['POST'])
-def delete_product(product_id):
-    conn = sqlite3.connect('cafe_management.db')
-    cursor = conn.cursor()
-
-    cursor.execute("DELETE FROM Products WHERE id=?", (product_id,))
-    conn.commit()
-    conn.close()
-
-    print(f"ID {product_id} の商品を削除しました。")
-    return redirect(url_for('list_products'))
-
-@app.route('/stock/add', methods=['GET', 'POST'])
-def add_stock():
-    if request.method == 'POST':
-        product_id = int(request.form['product_id'])
-        quantity = int(request.form['quantity'])
-        notes = request.form['notes']
-        recorded_by = 1  # Replace with user ID (Here, user ID is 1)
-
-        conn = sqlite3.connect('cafe_management.db')
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO Stock_History (product_id, quantity, entry_date, notes, recorded_by) VALUES (?, ?, ?, ?, ?)",
-                       (product_id, quantity, datetime.now(), notes, recorded_by))
-        conn.commit()
-        conn.close()
-
-        print("データベースに在庫履歴を追加しました。")
-        return redirect(url_for('add_stock'))
-
-    conn = sqlite3.connect('cafe_management.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT id, name FROM Products")
-    products = cursor.fetchall()
-    conn.close()
-
-    return render_template('add_stock_history.html', products=products)
-
-@app.route('/stock_history')
-def list_stock_history():
-    conn = sqlite3.connect('cafe_management.db')
-    cursor = conn.cursor()
-    cursor.execute("SELECT sh.id, p.name, sh.quantity, sh.entry_date, sh.notes FROM Stock_History sh JOIN Products p ON sh.product_id = p.id")
-    stock_history = cursor.fetchall()
-    conn.close()
-
-    return render_template('list_stock_history.html', stock_history=stock_history)
+    return render_template('show_products.html', products=products)
 
 if __name__ == '__main__':
     init_db()
