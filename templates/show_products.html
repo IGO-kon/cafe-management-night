@@ -4,25 +4,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>商品一覧</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .rainbow-button {
+            transition: background-color 0.5s ease;
+        }
+        .rainbow-button:hover {
+            background: linear-gradient(to right, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #9400d3);
+            background-size: 400%;
+            animation: rainbow 4s linear infinite;
+        }
+        @keyframes rainbow {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>商品一覧</h1>
-    <a href="{{ url_for('add_product') }}">商品追加ページへ移動</a>
-    <table border="1">
-        <tr>
-            <th>ID</th>
-            <th>商品名</th>
-            <th>カテゴリ</th>
-            <th>価格</th>
-        </tr>
-        {% for product in products %}
-        <tr>
-            <td>{{ product[0] }}</td>
-            <td>{{ product[1] }}</td>
-            <td>{{ product[2] }}</td>
-            <td>{{ product[3] }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="container">
+        <h1 class="text-center">商品一覧</h1>
+        <div class="text-center mb-3">
+            <a href="{{ url_for('add_product') }}" class="btn btn-primary rainbow-button" id="rainbow-btn">商品追加ページへ移動</a>
+        </div>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>商品名</th>
+                    <th>カテゴリ</th>
+                    <th>価格</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product[0] }}</td>
+                    <td>{{ product[1] }}</td>
+                    <td>{{ product[2] }}</td>
+                    <td>{{ product[3] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            var konamiCode = '';
+            var konami = '38383840105105110117';
+            $(document).keydown(function(e){
+                konamiCode += e.keyCode;
+                if (konamiCode == konami) {
+                    $('#rainbow-btn').addClass('rainbow-button');
+                } else if (konamiCode.length > konami.length) {
+                    konamiCode = '';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
